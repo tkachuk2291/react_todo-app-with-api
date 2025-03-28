@@ -31,10 +31,14 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
     if (trimmedTitle) {
       updateTodoTitle(todo, trimmedTitle)
+        .then(() => setIsEditing(false))
+        .catch(error => {
+          console.error('Failed to update todo:', error);
+          setIsEditing(true);
+        });
     } else {
-      deleteTodo?.(todo.id)
+      deleteTodo?.(todo.id);
     }
-    setIsEditing(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -62,7 +66,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       </label>
 
       {isEditing ? (
-        <form>
+        <form onSubmit={event => event.preventDefault()}>
           <input
             data-cy="TodoTitleField"
             type="text"
