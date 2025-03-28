@@ -139,6 +139,7 @@ export const App: React.FC = () => {
         setLoadingTodoIds(prevState =>
           prevState.filter(prevTodo => prevTodo !== todo.id),
         );
+        resetError();
       })
   }
 
@@ -155,14 +156,16 @@ export const App: React.FC = () => {
           return newTodos;
         });
       })
+      .catch(() => {
+        handleError('updateTodoError', true);
+      })
       .finally(() => {
+        resetError()
         setLoadingTodoIds(prevState =>
           prevState.filter(prevTodo => prevTodo !== todo.id),
         );
       })
-      .catch(() => {
-        handleError('updateTodoError', true);
-      });
+
   }
 
   const filteredTodos = todos.filter(todo => {
