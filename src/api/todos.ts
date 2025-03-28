@@ -12,8 +12,8 @@ export const getTodos = () => {
 
 
 
-export function updateTodos(  { id, title  , userId , completed} : Todo)  {
-  return client.patch<Todo>( `/todos/${id}` , {title , userId , completed})
+export function updateTodoTitleOnServer(  { id} : Todo  , newTitle : string)  {
+  return client.patch<Todo>( `/todos/${id}` , {title : newTitle})
 }
 
 

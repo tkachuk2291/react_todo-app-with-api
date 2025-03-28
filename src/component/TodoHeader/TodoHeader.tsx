@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createTodo, USER_ID } from '../../api/todos';
 import { Todo } from '../../types/Todo';
+import cls from 'classnames';
 
 export interface TodoHeaderProps {
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
@@ -19,6 +20,8 @@ export interface TodoHeaderProps {
   inputRefTarget: HTMLInputElement | null;
   handleError: (type: string, boolean: boolean) => void;
   updateAllTodo : () => void
+  allCompleted :  boolean
+  todos : Todo[]
 }
 
 export const TodoHeader: React.FC<TodoHeaderProps> = ({
@@ -34,7 +37,7 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
   hideErrors,
   setInputRefTarget,
   inputRefTarget,
-  handleError,updateAllTodo
+  handleError,updateAllTodo, allCompleted , todos
 
 }) => {
   const [title, setTitle] = useState('');
@@ -109,12 +112,14 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
   return (
     <header className="todoapp__header">
       {/* this button should have `active` class only if all todos are completed */}
-      <button
-        type="button"
-        className="todoapp__toggle-all active"
-        data-cy="ToggleAllButton"
-        onClick={updateAllTodo}
-      />
+      {todos.length > 0 && (
+        <button
+          type="button"
+          className={cls('todoapp__toggle-all ', { active: allCompleted })}
+          data-cy="ToggleAllButton"
+          onClick={updateAllTodo}
+        />
+      )}
 
       {/* Add a todo on form submit */}
       <form onSubmit={handleSubmit} onReset={() => setTitle('')}>
