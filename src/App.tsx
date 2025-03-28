@@ -32,6 +32,7 @@ export const App: React.FC = () => {
 
 
   function handleError(type: string, boolean: boolean) {
+    console.log(`handleError вызван с ${type}: ${boolean}`);
     switch (type) {
       case 'hasTitleError':
         setHasTitleError(boolean);
@@ -59,7 +60,6 @@ export const App: React.FC = () => {
     handleError('addTodoError', false);
     handleError('deleteTodoError', false);
     handleError('updateTodoError', false);
-
 
   }
 
@@ -132,14 +132,14 @@ export const App: React.FC = () => {
           return newTodos;
         });
       })
+      .catch(() => {
+        handleError('updateTodoError', true);
+      })
       .finally(() => {
         setLoadingTodoIds(prevState =>
           prevState.filter(prevTodo => prevTodo !== todo.id),
         );
       })
-      .catch(() => {
-        handleError('updateTodoTitleError', true);
-      });
   }
 
   function updateTodo(todo: Todo) {
