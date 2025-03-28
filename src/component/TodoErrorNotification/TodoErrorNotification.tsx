@@ -24,9 +24,8 @@ export const TodoErrorNotification: React.FC<TodoErrorNotificationProps> = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={() => setError(Errors.none)}
+        onClick={() => setError(Errors.None)}
       />
-      {/*/!* show only one message at a time *!/*/}
       {getErrorMessage}
     </div>
   );

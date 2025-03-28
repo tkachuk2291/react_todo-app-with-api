@@ -6,10 +6,10 @@ export interface Todo {
 }
 
 export enum Errors {
-  titleError = 'Title should not be empty',
-  addTodoError = 'Unable to add a todo',
-  updateTodoError = 'Unable to update a todo',
-  loadTodoError = 'Unable to load todos',
-  deleteTodoError = 'Unable to delete a todo',
-  none = ''
+  TitleError = 'Title should not be empty',
+  AddTodoError = 'Unable to add a todo',
+  UpdateTodoError = 'Unable to update a todo',
+  LoadTodoError = 'Unable to load todos',
+  DeleteTodoError = 'Unable to delete a todo',
+  None = ''
 }

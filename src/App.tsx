@@ -2,7 +2,13 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useEffect, useState } from 'react';
 import { UserWarning } from './UserWarning';
-import { deleteTodos, getTodos, updateTodoOnServer, updateTodosCheckbox, USER_ID } from './api/todos';
+import {
+  deleteTodos,
+  getTodos,
+  updateTodoOnServer,
+  updateTodosCheckbox,
+  USER_ID,
+} from './api/todos';
 import { Errors } from './types/Todo';
 import { TodoHeader } from './component/TodoHeader/TodoHeader';
 import { TodoFooter } from './component/TodoFooter/TodoFooter';
@@ -11,35 +17,6 @@ import { TodoList } from './component/TodoList/TodoList';
 import { TodoErrorNotification } from './component/TodoErrorNotification/TodoErrorNotification';
 
 export const App: React.FC = () => {
-  interface Todo {
-    id: number;
-    userId: number;
-    title: string;
-    completed: boolean;
-  }
-
-  // const [hasTitleError, setHasTitleError] = useState(false);
-  // const [loadTodoError, setLoadTodoError] = useState(false);
-  // const [addTodoError, setAddTodoError] = useState(false);
-  // const [deleteTodoError, setDeleteTodoError] = useState(false);
-  // const [updateTodoError, setUpdateTodoError] = useState(false);
-  const [error, setError] = useState<Errors>(Errors.none);
-
-  // onClick={() => setError(Erros.none)}
-
-  function handleError(type: Errors) {
-    setError(type)
-    setTimeout(() => setError(Errors.none) , 3000)
-  }
-
-  // function handleResetError() {
-  //   handleError('hasTitleError', false);
-  //   handleError('loadTodoError', false);
-  //   handleError('addTodoError', false);
-  //   handleError('deleteTodoError', false);
-  //   handleError('updateTodoError', false);
-  // }
-
   const [status, setStatus] = useState('all');
   const [todos, setTodos] = useState<Todo[]>([]);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
@@ -48,6 +25,19 @@ export const App: React.FC = () => {
   const [inputRefTarget, setInputRefTarget] = useState<HTMLInputElement | null>(
     null,
   );
+  const [error, setError] = useState<Errors>(Errors.None);
+
+  interface Todo {
+    id: number;
+    userId: number;
+    title: string;
+    completed: boolean;
+  }
+
+  function handleError(type: Errors) {
+    setError(type);
+    setTimeout(() => setError(Errors.None), 3000);
+  }
 
   if (!USER_ID) {
     return <UserWarning />;
@@ -57,44 +47,16 @@ export const App: React.FC = () => {
     getTodos()
       .then(setTodos)
       .catch(() => {
-        handleError(Errors.loadTodoError);
+        handleError(Errors.LoadTodoError);
       });
   }, []);
 
-  // const resetError = () => {
-  //   if (errorTimerRef.current) {
-  //     clearTimeout(errorTimerRef.current);
-  //   }
-  //   errorTimerRef.current = window.setTimeout(() => {
-  //     handleResetError();
-  //     errorTimerRef.current = null;
-  //   }, 3000);
-  // };
-
-  // const hideErrors = () => {
-  //   if (errorTimerRef.current) {
-  //     clearTimeout(errorTimerRef.current);
-  //     errorTimerRef.current = null;
-  //   }
-  // };
-
-  // const getErrorMessage = () => {
-  //   if (hasTitleError) return Errors.titleError;
-  //   if (loadTodoError) return Errors.loadTodoError;
-  //   if (addTodoError) return Errors.addTodoError;
-  //   if (deleteTodoError) return Errors.deleteTodoError;
-  //   if (updateTodoError) return Errors.updateTodoError;
-  //   return '';
-  // };
-
-  const isErrorHidden = () => !error
-
+  const isErrorHidden = () => !error;
 
   function updateTodoTitle(
     todo: Todo,
     onSuccess?: VoidFunction,
   ): Promise<void> {
-    setError(Errors.none);
     setLoadingTodoIds(prevState => [...prevState, todo.id]);
     return updateTodoOnServer(todo) // Функция API для обновления title
       .then(updatedTodo => {
@@ -106,10 +68,11 @@ export const App: React.FC = () => {
           }
           return newTodos;
         });
+        setError(Errors.None);
         onSuccess?.();
       })
       .catch(() => {
-        handleError(Errors.updateTodoError);
+        handleError(Errors.UpdateTodoError);
       })
       .finally(() => {
         setLoadingTodoIds(prevState =>
@@ -119,10 +82,10 @@ export const App: React.FC = () => {
   }
 
   function updateTodo(todo: Todo) {
-    setError(Errors.none);
+    setError(Errors.None);
     setLoadingTodoIds(prevState => [...prevState, todo.id]);
     const newStatus = !todo.completed;
-    updateTodoOnServer({...todo, completed: newStatus})
+    updateTodoOnServer({ ...todo, completed: newStatus })
       .then(todo => {
         setTodos?.(currentPost => {
           const newTodos = [...currentPost];
@@ -132,7 +95,7 @@ export const App: React.FC = () => {
         });
       })
       .catch(() => {
-        handleError(Errors.updateTodoError);
+        handleError(Errors.UpdateTodoError);
       })
       .finally(() => {
         setLoadingTodoIds(prevState =>
@@ -152,7 +115,7 @@ export const App: React.FC = () => {
   });
 
   function deleteTodo(todoId: number) {
-    setError(Errors.none);
+    setError(Errors.None);
     setLoadingTodoIds(prevState => [...prevState, todoId]);
     return deleteTodos(todoId)
       .then(() => {
@@ -162,7 +125,7 @@ export const App: React.FC = () => {
         inputRefTarget?.focus();
       })
       .catch(() => {
-        handleError(Errors.deleteTodoError);
+        handleError(Errors.DeleteTodoError);
         inputRefTarget?.focus();
         return;
       })
@@ -175,18 +138,17 @@ export const App: React.FC = () => {
   }
 
   function deleteCompletedTodo() {
-    setError(Errors.none);
+    setError(Errors.None);
     const filteredTodos = todos.filter(todo => todo.completed);
-    Promise.all(filteredTodos.map(todo => deleteTodo(todo.id)))
-      .catch(() => {
-        handleError(Errors.deleteTodoError);
+    Promise.all(filteredTodos.map(todo => deleteTodo(todo.id))).catch(() => {
+      handleError(Errors.DeleteTodoError);
     });
   }
 
   const allCompleted = todos.every(todo => todo.completed);
 
   function updateAllTodo() {
-    setError(Errors.none);
+    setError(Errors.None);
     const todoToUpdate = allCompleted
       ? todos
       : todos.filter(todo => !todo.completed);
@@ -211,7 +173,7 @@ export const App: React.FC = () => {
         ),
       )
       .catch(() => {
-        handleError(Errors.updateTodoError);
+        handleError(Errors.UpdateTodoError);
       });
   }
 
@@ -227,10 +189,6 @@ export const App: React.FC = () => {
           setIsLoading={setIsLoading}
           error={error}
           isLoading={isLoading}
-          // hasTitleError={hasTitleError}
-          // loadTodoError={loadTodoError}
-          // addTodoError={addTodoError}
-          // deleteTodoError={deleteTodoError}
           setInputRefTarget={setInputRefTarget}
           inputRefTarget={inputRefTarget}
           updateAllTodo={updateAllTodo}
@@ -256,16 +214,12 @@ export const App: React.FC = () => {
             />
           </>
         )}
-        {/* Hide the footer if there are no todos */}
       </div>
 
-      {/* DON'T use conditional rendering to hide the notification */}
-      {/* Add the 'hidden' class to hide the message smoothly */}
       <TodoErrorNotification
         getErrorMessage={error}
         isErrorHidden={isErrorHidden}
         setError={setError}
-
       />
     </div>
   );

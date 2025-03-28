@@ -8,9 +8,8 @@ export interface TodoListProps {
   isLoading: boolean;
   loadingTodoIds: number[];
   deleteTodo: (todoId: number) => void;
-  onUpdateTodo : (todo : Todo) =>void
-  updateTodoTitle: (todo: Todo , onSuccess?: VoidFunction) => Promise<void>;
-
+  onUpdateTodo: (todo: Todo) => void;
+  updateTodoTitle: (todo: Todo, onSuccess?: VoidFunction) => Promise<void>;
 }
 
 export const TodoList: React.FC<TodoListProps> = ({
@@ -18,27 +17,25 @@ export const TodoList: React.FC<TodoListProps> = ({
   tempTodo,
   isLoading,
   deleteTodo,
-  loadingTodoIds, onUpdateTodo , updateTodoTitle
-
+  loadingTodoIds,
+  onUpdateTodo,
+  updateTodoTitle,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
       {/*This is a completed todo */}
       {filteredTodos.map(todo => {
-          return (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              deleteTodo={deleteTodo}
-              isLoading={loadingTodoIds.includes(todo.id)}
-              onUpdateTodo={onUpdateTodo}
-              updateTodoTitle={updateTodoTitle}
-            />
-          );
-
-        }
-      )
-      }
+        return (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            deleteTodo={deleteTodo}
+            isLoading={loadingTodoIds.includes(todo.id)}
+            onUpdateTodo={onUpdateTodo}
+            updateTodoTitle={updateTodoTitle}
+          />
+        );
+      })}
       {tempTodo !== null && (
         <TodoItem
           key={tempTodo.id}
@@ -48,7 +45,6 @@ export const TodoList: React.FC<TodoListProps> = ({
           updateTodoTitle={updateTodoTitle}
         />
       )}
-
     </section>
   );
 };

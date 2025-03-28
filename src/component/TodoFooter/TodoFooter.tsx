@@ -65,7 +65,6 @@ export const TodoFooter: React.FC<TodoFooterProps> = ({
           Completed
         </a>
       </nav>
-      {/* this button should be disabled if there are no completed todos */}
 
       <button
         type="button"

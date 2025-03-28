@@ -22,8 +22,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   const [title, setTitle] = useState(todo.title);
 
   const onSuccess = () => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleUpdate = () => {
     const trimmedTitle = title.trim();
@@ -34,8 +34,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
     }
 
     if (trimmedTitle) {
-      updateTodoTitle({...todo, title: trimmedTitle}  , onSuccess)
-
+      updateTodoTitle({ ...todo, title: trimmedTitle }, onSuccess);
     } else {
       deleteTodo?.(todo.id);
     }
@@ -100,8 +99,6 @@ export const TodoItem: React.FC<TodoItemProps> = ({
           ×
         </button>
       )}
-
-      {/* overlay will cover the todo while it is being deleted or updated */}
       <div
         data-cy="TodoLoader"
         className={cls('modal overlay', { 'is-active': isLoading })}

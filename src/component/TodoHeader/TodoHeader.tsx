@@ -8,13 +8,15 @@ export interface TodoHeaderProps {
   setTempTodo: React.Dispatch<React.SetStateAction<Todo | null>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isLoading: boolean;
-  setInputRefTarget: React.Dispatch<React.SetStateAction<HTMLInputElement | null>>;
+  setInputRefTarget: React.Dispatch<
+    React.SetStateAction<HTMLInputElement | null>
+  >;
   inputRefTarget: HTMLInputElement | null;
   handleError: (type: Errors) => void;
-  error : string
-  updateAllTodo : () => void
-  allCompleted :  boolean
-  todos : Todo[]
+  error: string;
+  updateAllTodo: () => void;
+  allCompleted: boolean;
+  todos: Todo[];
 }
 
 export const TodoHeader: React.FC<TodoHeaderProps> = ({
@@ -24,8 +26,11 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
   isLoading,
   setInputRefTarget,
   inputRefTarget,
-  handleError,updateAllTodo, allCompleted , todos , error
-
+  handleError,
+  updateAllTodo,
+  allCompleted,
+  todos,
+  error,
 }) => {
   const [title, setTitle] = useState('');
 
@@ -33,7 +38,7 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
     const format_title = title.trim();
     event.preventDefault();
     if (!format_title) {
-      handleError(Errors.titleError);
+      handleError(Errors.TitleError);
       return;
     }
     addPost();
@@ -79,10 +84,9 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
         setTitle('');
         inputRefTarget?.focus();
       })
-      .catch(error => {
-        handleError(Errors.addTodoError);
+      .catch(() => {
+        handleError(Errors.AddTodoError);
         inputRefTarget?.focus();
-        throw error;
       })
       .finally(() => {
         setIsLoading(false);
@@ -90,11 +94,8 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
       });
   };
 
-
-
   return (
     <header className="todoapp__header">
-      {/* this button should have `active` class only if all todos are completed */}
       {todos.length > 0 && (
         <button
           type="button"
