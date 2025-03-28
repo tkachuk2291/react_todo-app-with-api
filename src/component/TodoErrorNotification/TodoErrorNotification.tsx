@@ -1,16 +1,17 @@
 import React from 'react';
 import cls from 'classnames';
+import { Errors } from '../../types/Todo';
 
 export interface TodoErrorNotificationProps {
-  getErrorMessage: () => string;
+  getErrorMessage: string;
   isErrorHidden: () => boolean;
-  hideErrors: () => void;
+  setError: (type: Errors) => void;
 }
 
 export const TodoErrorNotification: React.FC<TodoErrorNotificationProps> = ({
   getErrorMessage,
   isErrorHidden,
-  hideErrors,
+  setError,
 }) => {
   return (
     <div
@@ -23,10 +24,10 @@ export const TodoErrorNotification: React.FC<TodoErrorNotificationProps> = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={hideErrors}
+        onClick={() => setError(Errors.none)}
       />
       {/*/!* show only one message at a time *!/*/}
-      {getErrorMessage()}
+      {getErrorMessage}
     </div>
   );
 };

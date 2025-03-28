@@ -9,7 +9,8 @@ export interface TodoListProps {
   loadingTodoIds: number[];
   deleteTodo: (todoId: number) => void;
   onUpdateTodo : (todo : Todo) =>void
-  updateTodoTitle: (todo: Todo, newTitle: string) => Promise<void>;
+  updateTodoTitle: (todo: Todo , onSuccess?: VoidFunction) => Promise<void>;
+
 }
 
 export const TodoList: React.FC<TodoListProps> = ({

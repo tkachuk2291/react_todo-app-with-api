@@ -8,7 +8,7 @@ export interface TodoItemProps {
   isLoading?: boolean;
   deleteTodo?: (todoId: number) => void;
   onUpdateTodo: (todo: Todo) => void;
-  updateTodoTitle: (todo: Todo, newTitle: string) => Promise<void>;
+  updateTodoTitle: (todo: Todo, onSuccess?: VoidFunction) => Promise<void>;
 }
 
 export const TodoItem: React.FC<TodoItemProps> = ({
@@ -21,6 +21,10 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(todo.title);
 
+  const onSuccess = () => {
+    setIsEditing(false)
+  }
+
   const handleUpdate = () => {
     const trimmedTitle = title.trim();
 
@@ -30,12 +34,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
     }
 
     if (trimmedTitle) {
-      updateTodoTitle(todo, trimmedTitle)
-        .then(() => setIsEditing(false))
-        .catch(error => {
-          console.error('Failed to update todo:', error);
-          setIsEditing(true);
-        });
+      updateTodoTitle({...todo, title: trimmedTitle}  , onSuccess)
+
     } else {
       deleteTodo?.(todo.id);
     }

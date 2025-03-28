@@ -1,24 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createTodo, USER_ID } from '../../api/todos';
-import { Todo } from '../../types/Todo';
+import { Errors, Todo } from '../../types/Todo';
 import cls from 'classnames';
 
 export interface TodoHeaderProps {
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-  resetError: () => void;
   setTempTodo: React.Dispatch<React.SetStateAction<Todo | null>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isLoading: boolean;
-  hasTitleError: boolean;
-  loadTodoError: boolean;
-  addTodoError: boolean;
-  deleteTodoError: boolean;
-  hideErrors: () => void;
-  setInputRefTarget: React.Dispatch<
-    React.SetStateAction<HTMLInputElement | null>
-  >;
+  setInputRefTarget: React.Dispatch<React.SetStateAction<HTMLInputElement | null>>;
   inputRefTarget: HTMLInputElement | null;
-  handleError: (type: string, boolean: boolean) => void;
+  handleError: (type: Errors) => void;
+  error : string
   updateAllTodo : () => void
   allCompleted :  boolean
   todos : Todo[]
@@ -26,18 +19,12 @@ export interface TodoHeaderProps {
 
 export const TodoHeader: React.FC<TodoHeaderProps> = ({
   setTodos,
-  resetError,
   setTempTodo,
   setIsLoading,
   isLoading,
-  hasTitleError,
-  loadTodoError,
-  addTodoError,
-  deleteTodoError,
-  hideErrors,
   setInputRefTarget,
   inputRefTarget,
-  handleError,updateAllTodo, allCompleted , todos
+  handleError,updateAllTodo, allCompleted , todos , error
 
 }) => {
   const [title, setTitle] = useState('');
@@ -46,12 +33,9 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
     const format_title = title.trim();
     event.preventDefault();
     if (!format_title) {
-      handleError('hasTitleError', true);
-      resetError();
+      handleError(Errors.titleError);
       return;
     }
-    hideErrors();
-
     addPost();
   };
 
@@ -69,7 +53,7 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
 
   useEffect(() => {
     inputRefTarget?.focus();
-  }, [title, hasTitleError, loadTodoError, addTodoError, deleteTodoError]);
+  }, [title, error]);
 
   const addPost = () => {
     const formattedTitle = title.trim();
@@ -96,8 +80,7 @@ export const TodoHeader: React.FC<TodoHeaderProps> = ({
         inputRefTarget?.focus();
       })
       .catch(error => {
-        handleError('addTodoError', true);
-        resetError();
+        handleError(Errors.addTodoError);
         inputRefTarget?.focus();
         throw error;
       })

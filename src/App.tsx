@@ -1,14 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserWarning } from './UserWarning';
-import {
-  deleteTodos,
-  getTodos,
-  updateTodosCheckbox,
-  updateTodoTitleOnServer,
-  USER_ID,
-} from './api/todos';
+import { deleteTodos, getTodos, updateTodoOnServer, updateTodosCheckbox, USER_ID } from './api/todos';
 import { Errors } from './types/Todo';
 import { TodoHeader } from './component/TodoHeader/TodoHeader';
 import { TodoFooter } from './component/TodoFooter/TodoFooter';
@@ -24,49 +18,29 @@ export const App: React.FC = () => {
     completed: boolean;
   }
 
-  const [hasTitleError, setHasTitleError] = useState(false);
-  const [loadTodoError, setLoadTodoError] = useState(false);
-  const [addTodoError, setAddTodoError] = useState(false);
-  const [deleteTodoError, setDeleteTodoError] = useState(false);
-  const [updateTodoError, setUpdateTodoError] = useState(false);
+  // const [hasTitleError, setHasTitleError] = useState(false);
+  // const [loadTodoError, setLoadTodoError] = useState(false);
+  // const [addTodoError, setAddTodoError] = useState(false);
+  // const [deleteTodoError, setDeleteTodoError] = useState(false);
+  // const [updateTodoError, setUpdateTodoError] = useState(false);
+  const [error, setError] = useState<Errors>(Errors.none);
 
+  // onClick={() => setError(Erros.none)}
 
-  function handleError(type: string, boolean: boolean) {
-    console.log(`handleError вызван с ${type}: ${boolean}`);
-    switch (type) {
-      case 'hasTitleError':
-        setHasTitleError(boolean);
-        break;
-      case 'loadTodoError':
-        setLoadTodoError(boolean);
-        break;
-      case 'addTodoError':
-        setAddTodoError(boolean);
-        break;
-      case 'deleteTodoError':
-        setDeleteTodoError(boolean);
-        break;
-      case 'updateTodoError':
-        setUpdateTodoError(boolean);
-        break;
-      default:
-        console.error('Unknown error type');
-    }
+  function handleError(type: Errors) {
+    setError(type)
+    setTimeout(() => setError(Errors.none) , 3000)
   }
 
-  function handleResetError() {
-    handleError('hasTitleError', false);
-    handleError('loadTodoError', false);
-    handleError('addTodoError', false);
-    handleError('deleteTodoError', false);
-    handleError('updateTodoError', false);
-
-  }
+  // function handleResetError() {
+  //   handleError('hasTitleError', false);
+  //   handleError('loadTodoError', false);
+  //   handleError('addTodoError', false);
+  //   handleError('deleteTodoError', false);
+  //   handleError('updateTodoError', false);
+  // }
 
   const [status, setStatus] = useState('all');
-  // const [checkboxStatus, setCheckboxStatus] = useState(false);
-  // const [currentTodo , setCrurentTodo] = useState<Todo| null>(null);
-  const errorTimerRef = useRef<number | null>(null);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,45 +57,46 @@ export const App: React.FC = () => {
     getTodos()
       .then(setTodos)
       .catch(() => {
-        handleError('loadTodoError', true);
-        resetError();
+        handleError(Errors.loadTodoError);
       });
   }, []);
 
-  const resetError = () => {
-    if (errorTimerRef.current) {
-      clearTimeout(errorTimerRef.current);
-    }
-    errorTimerRef.current = window.setTimeout(() => {
-      handleResetError();
-      errorTimerRef.current = null;
-    }, 3000);
-  };
+  // const resetError = () => {
+  //   if (errorTimerRef.current) {
+  //     clearTimeout(errorTimerRef.current);
+  //   }
+  //   errorTimerRef.current = window.setTimeout(() => {
+  //     handleResetError();
+  //     errorTimerRef.current = null;
+  //   }, 3000);
+  // };
 
-  const hideErrors = () => {
-    if (errorTimerRef.current) {
-      clearTimeout(errorTimerRef.current);
-      errorTimerRef.current = null;
-    }
-    handleResetError();
-  };
+  // const hideErrors = () => {
+  //   if (errorTimerRef.current) {
+  //     clearTimeout(errorTimerRef.current);
+  //     errorTimerRef.current = null;
+  //   }
+  // };
 
-  const getErrorMessage = () => {
-    if (hasTitleError) return Errors.titleError;
-    if (loadTodoError) return Errors.loadTodoError;
-    if (addTodoError) return Errors.addTodoError;
-    if (deleteTodoError) return Errors.deleteTodoError;
-    if (updateTodoError)  return  Errors.updateTodoError
-    return '';
-  };
+  // const getErrorMessage = () => {
+  //   if (hasTitleError) return Errors.titleError;
+  //   if (loadTodoError) return Errors.loadTodoError;
+  //   if (addTodoError) return Errors.addTodoError;
+  //   if (deleteTodoError) return Errors.deleteTodoError;
+  //   if (updateTodoError) return Errors.updateTodoError;
+  //   return '';
+  // };
 
-  const isErrorHidden = () =>
-    !hasTitleError && !loadTodoError && !addTodoError && !deleteTodoError && !updateTodoError;
+  const isErrorHidden = () => !error
 
-  function updateTodoTitle(todo: Todo, newTitle: string): Promise<void> {
+
+  function updateTodoTitle(
+    todo: Todo,
+    onSuccess?: VoidFunction,
+  ): Promise<void> {
+    setError(Errors.none);
     setLoadingTodoIds(prevState => [...prevState, todo.id]);
-
-    return updateTodoTitleOnServer(todo, newTitle) // Функция API для обновления title
+    return updateTodoOnServer(todo) // Функция API для обновления title
       .then(updatedTodo => {
         setTodos?.(currentTodos => {
           const newTodos = [...currentTodos];
@@ -131,23 +106,23 @@ export const App: React.FC = () => {
           }
           return newTodos;
         });
+        onSuccess?.();
       })
       .catch(() => {
-        handleError('updateTodoError', true);
+        handleError(Errors.updateTodoError);
       })
       .finally(() => {
         setLoadingTodoIds(prevState =>
           prevState.filter(prevTodo => prevTodo !== todo.id),
         );
-        resetError();
-      })
+      });
   }
 
   function updateTodo(todo: Todo) {
+    setError(Errors.none);
     setLoadingTodoIds(prevState => [...prevState, todo.id]);
-
     const newStatus = !todo.completed;
-    updateTodosCheckbox(todo, newStatus)
+    updateTodoOnServer({...todo, completed: newStatus})
       .then(todo => {
         setTodos?.(currentPost => {
           const newTodos = [...currentPost];
@@ -157,15 +132,13 @@ export const App: React.FC = () => {
         });
       })
       .catch(() => {
-        handleError('updateTodoError', true);
+        handleError(Errors.updateTodoError);
       })
       .finally(() => {
-        resetError()
         setLoadingTodoIds(prevState =>
           prevState.filter(prevTodo => prevTodo !== todo.id),
         );
-      })
-
+      });
   }
 
   const filteredTodos = todos.filter(todo => {
@@ -179,8 +152,8 @@ export const App: React.FC = () => {
   });
 
   function deleteTodo(todoId: number) {
+    setError(Errors.none);
     setLoadingTodoIds(prevState => [...prevState, todoId]);
-
     return deleteTodos(todoId)
       .then(() => {
         setTodos(currentPosts =>
@@ -189,8 +162,7 @@ export const App: React.FC = () => {
         inputRefTarget?.focus();
       })
       .catch(() => {
-        handleError('deleteTodoError', true);
-        resetError();
+        handleError(Errors.deleteTodoError);
         inputRefTarget?.focus();
         return;
       })
@@ -203,15 +175,18 @@ export const App: React.FC = () => {
   }
 
   function deleteCompletedTodo() {
+    setError(Errors.none);
     const filteredTodos = todos.filter(todo => todo.completed);
-    Promise.all(filteredTodos.map(todo => deleteTodo(todo.id))).catch(() => {
-      handleError('deleteTodoError', true);
+    Promise.all(filteredTodos.map(todo => deleteTodo(todo.id)))
+      .catch(() => {
+        handleError(Errors.deleteTodoError);
     });
   }
 
   const allCompleted = todos.every(todo => todo.completed);
 
   function updateAllTodo() {
+    setError(Errors.none);
     const todoToUpdate = allCompleted
       ? todos
       : todos.filter(todo => !todo.completed);
@@ -236,7 +211,7 @@ export const App: React.FC = () => {
         ),
       )
       .catch(() => {
-        handleError('updateTodoError', true);
+        handleError(Errors.updateTodoError);
       });
   }
 
@@ -247,15 +222,15 @@ export const App: React.FC = () => {
         <TodoHeader
           handleError={handleError}
           setTodos={setTodos}
-          resetError={resetError}
+          // resetError={resetError}
           setTempTodo={setTempTodo}
           setIsLoading={setIsLoading}
+          error={error}
           isLoading={isLoading}
-          hasTitleError={hasTitleError}
-          loadTodoError={loadTodoError}
-          addTodoError={addTodoError}
-          deleteTodoError={deleteTodoError}
-          hideErrors={hideErrors}
+          // hasTitleError={hasTitleError}
+          // loadTodoError={loadTodoError}
+          // addTodoError={addTodoError}
+          // deleteTodoError={deleteTodoError}
           setInputRefTarget={setInputRefTarget}
           inputRefTarget={inputRefTarget}
           updateAllTodo={updateAllTodo}
@@ -287,9 +262,10 @@ export const App: React.FC = () => {
       {/* DON'T use conditional rendering to hide the notification */}
       {/* Add the 'hidden' class to hide the message smoothly */}
       <TodoErrorNotification
-        getErrorMessage={getErrorMessage}
+        getErrorMessage={error}
         isErrorHidden={isErrorHidden}
-        hideErrors={hideErrors}
+        setError={setError}
+
       />
     </div>
   );
