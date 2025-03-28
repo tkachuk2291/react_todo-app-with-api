@@ -1588,6 +1588,7 @@ describe('', () => {
           todos.titleField(0).should('exist');
         });
 
+
         it('should show error message', () => {
           errorMessage.assertVisible();
           errorMessage.assertText('Unable to update a todo');
